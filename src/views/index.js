@@ -4,40 +4,52 @@ var r = require('r-dom')
 
 var Layout = require('../partials/layout')
 
+var vars = {
+  fontBase: 14,
+  gutterWidth: 60,
+}
+
 var style = {
   blocks: {
-    minWidth: 970
+    width: '100%'
   },
   block: {
-    minHeight: 560,
-    padding: '60px 0'
+    margin: 0,
+    minHeight: 320,
+    padding: vars.gutterWidth
   },
-  whyBlock: {
+  introBlock: {
+    backgroundImage: '-webkit-linear-gradient(top, #6f27ff, rgba(0,0,0,0));'
+  },
+  introH1: {
+    fontSize: vars.fontBase * 3,
+    fontWeight: 500,
+    lineHeight: 1.1
+  },
+  introH2: {
+    fontSize: vars.fontBase * 2,
+    fontWeight: 400,
+    lineHeight: 1.1
+  },
+  about: {
 
   },
-  whyH1: {
+  aboutH1: {
 
   },
-  whyH2: {
+  aboutP: {
 
   },
-  what: {
-
-  },
-  whatH1: {
-
-  },
-  whatP: {
-
-  },
-  how: {
+  value: {
 
   },
   who: {
 
   },
   actionButton: {
-
+    outline: 0,
+    '-webkitAppearance': 'button',
+    cursor: 'pointer'
   }
 }
 
@@ -50,17 +62,18 @@ module.exports = React.createClass({
         style: style.blocks
       }, [
         r.header({
-          style: assign(style.block, style.whyBlock)
+          style: assign(style.block, style.introBlock)
         }, [
           r.h1({
-            style: style.whyH1
+            style: style.introH1
           }, props.pitchPhrase),
           r.h2({
-            style: style.whyH2
+            style: style.introH2
           }, props.pitchSentence),
-          r.button({
-            style: style.actionButton
-          }, props.callToAction)
+          r.a({
+            style: style.actionButton,
+            href: props.callToAction.url
+          }, props.callToAction.text)
         ]),
         r.section({}, [
           
