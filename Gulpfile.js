@@ -1,4 +1,5 @@
 var gulp = require('gulp')
+var forEach = require('lodash.foreach')
 var render = require('gulp-react-render')
 var plumber = require('gulp-plumber')
 var watch = require('gulp-watch')
@@ -38,6 +39,24 @@ gulp.task('watch-html', ['build-html'], function () {
   })
 })
 
+var assetPaths = {
+  "src/assets/**/*": "build"
+}
+
+function assets (isWatch) {
+  return function () {
+    forEach(assetPaths, function (to, from) {
+      gulp.src(from, { dot: true })
+        .pipe(isWatch ? watch(from) : util.noop())
+        .pipe(gulp.dest(to))
+        .pipe(lr ? require('gulp-livereload')(lr) : util.noop())
+    })
+  }
+}
+
+gulp.task('build-assets', assets(false))
+gulp.task('watch-assets', assets(true))
+
 function livereload (cb) {
   lr = require('gulp-livereload')
   lr.listen(env.LIVERELOAD_PORT || 35729, cb)
@@ -45,5 +64,5 @@ function livereload (cb) {
 
 gulp.task('livereload', livereload)
 
-gulp.task('watch', ['livereload', 'watch-html'])
-gulp.task('build', ['build-html'])
+gulp.task('watch', ['livereload', 'watch-html', 'watch-assets'])
+gulp.task('build', ['build-html', 'build-assets'])
