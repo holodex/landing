@@ -12,7 +12,7 @@ module.exports = React.createClass({
       author: "Holodex",
       favicon: false,
       scripts: [],
-      stylesheets: []
+      stylesheets: ['index.css']
     }, props.children)
   }
 })
