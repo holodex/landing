@@ -35,14 +35,6 @@ gulp.task('watch-html', ['build-html'], function () {
   })
 })
 
-//gulp.task('watch-html', ['build-html'], function (cb) {
-//  watch('src/**/*.js', function (vinyl) {
-//    // invalidate require cache of file
-//    delete require.cache[vinyl.path]
-//    gulp.start('build-html')
-//  })
-//})
-
 function livereload (cb) {
   lr = require('gulp-livereload')
   lr.listen(env.LIVERELOAD_PORT || 35729, cb)
