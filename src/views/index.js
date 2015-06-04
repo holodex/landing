@@ -52,7 +52,7 @@ var style = Stylesheet.create({
 
   },
   whoBlock: {
-
+    display: 'none'
   },
   actionBlock: {
 
