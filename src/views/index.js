@@ -23,12 +23,12 @@ var style = {
   },
   introH1: {
     fontSize: vars.fontBase * 3,
-    fontWeight: 500,
+    fontWeight: 700,
     lineHeight: 1.1
   },
   introH2: {
     fontSize: vars.fontBase * 2,
-    fontWeight: 400,
+    fontWeight: 300,
     lineHeight: 1.1
   },
   about: {
