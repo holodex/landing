@@ -8,6 +8,23 @@ var Layout = require('../partials/layout')
 var vars = {
   fontBase: 14,
   gutterWidth: 60,
+// colors chosen from https://www.google.com/design/spec/style/color.html#color-color-palette
+//
+// primary Purple
+//  500  #9C27B0
+//  100  #E1BEE7
+//  800  #6A1B9A
+//
+// secondary Teal
+//  A700 #00BFA5
+  }
+var colors = {
+  primary: '#9C27B0',
+  primaryLight: '#E1BEE7',
+  primaryDark: '#6A1B9A',
+  secondary: '#00BFA5',
+  secondaryLight: '',
+  secondaryDark: ''
 }
 
 var style = Stylesheet.create({
@@ -20,7 +37,7 @@ var style = Stylesheet.create({
     padding: vars.gutterWidth
   },
   introBlock: {
-    backgroundColor: '#6f27ff',
+    backgroundColor: colors.primary,
     //backgroundImage: '-webkit-linear-gradient(top, #6f27ff, rgba(0,0,0,0));',
     display: 'flex',
     flexDirection: 'column',
@@ -31,16 +48,17 @@ var style = Stylesheet.create({
     fontSize: vars.fontBase * 3.8,
     fontWeight: 700,
     lineHeight: 1.1,
-    color: 'white'
+    color: colors.primaryLight
   },
   introH2: {
     fontSize: vars.fontBase * 2,
     fontWeight: 300,
     lineHeight: 1.1,
-    width: '75%'
+    width: '75%',
+    color: colors.primaryLight
   },
   aboutBlock: {
-
+    backgroundColor: colors.primaryLight
   },
   aboutH1: {
 
@@ -55,6 +73,7 @@ var style = Stylesheet.create({
     display: 'none'
   },
   actionBlock: {
+    backgroundColor: colors.primaryDark
 
   },
   actionButton: {
