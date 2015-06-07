@@ -29,7 +29,7 @@ will build on watch and start a livereload server
 npm run develop
 ```
 
-### stage (TODO)
+### stage
 
 will build once and deploy to gh-pages
 
