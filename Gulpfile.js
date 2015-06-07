@@ -123,6 +123,10 @@ function assets (isWatch) {
 gulp.task('build-assets', assets(false))
 gulp.task('watch-assets', assets(true))
 
+//
+// livereload
+//
+
 function livereload (cb) {
   lr = require('gulp-livereload')
   lr.listen(env.LIVERELOAD_PORT || 35729, cb)
@@ -130,5 +134,20 @@ function livereload (cb) {
 
 gulp.task('livereload', livereload)
 
+//
+// deploy
+//
+
+function branch () {
+  var branch = require('gulp-build-branch')
+  branch({
+    folder: 'build'
+  })
+}
+
+gulp.task('branch', ['build'], branch)
+
+// watch tasks
 gulp.task('watch', ['livereload', 'watch-html', 'watch-assets', 'watch-js'])
+// build tasks
 gulp.task('build', ['build-html', 'build-assets', 'build-js'])

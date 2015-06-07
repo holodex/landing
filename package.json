@@ -12,7 +12,8 @@
     "start": "npm run build && npm run server",
     "develop": "NODE_ENV=development npm run watch-start",
     "prod": "NODE_ENV=production npm start",
-    "deploy": "git remote add deploy dokku@holodex.enspiral.info:holodex; git push deploy master"
+    "stage": "(export NODE_ENV=staging; gulp branch && git push origin gh-pages -f)",
+    "deploy": "(export NODE_ENV=production; gulp branch && git push deploy gh-pages:master -f)"
   },
   "repository": {
     "type": "git",
@@ -35,9 +36,11 @@
     "ecstatic": "^0.8.0",
     "factor-bundle": "^2.4.1",
     "gulp": "^3.8.11",
+    "gulp-build-branch": "^0.1.4",
     "gulp-plumber": "^1.0.1",
     "gulp-react-render": "git://github.com/holodex/gulp-react-render",
     "gulp-sourcemaps": "^1.5.2",
+    "gulp-uglify": "^1.2.0",
     "gulp-util": "^3.0.5",
     "gulp-watch": "^4.2.4",
     "lodash.assign": "^3.2.0",
