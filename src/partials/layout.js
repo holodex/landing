@@ -11,8 +11,8 @@ module.exports = React.createClass({
       description: props.description,
       author: "Holodex",
       favicon: false,
-      scripts: [],
-      stylesheets: ['index.css']
+      javascripts: ['js/index.js'],
+      stylesheets: ['css/index.css']
     }, props.children)
   }
 })
