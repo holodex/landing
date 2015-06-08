@@ -12,7 +12,7 @@ var env = process.env
 var nodeEnv = env.NODE_ENV
 
 var isDeploy = function (env) {
-  return env === 'production' || env === 'staging'
+  return env === 'production'
 }
 
 var lr
