@@ -18372,6 +18372,298 @@ module.exports = warning;
 module.exports = require('./lib/React');
 
 },{"./lib/React":32}],151:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _slicedToArray(arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }
+
+function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
+
+var _utils = require('./utils');
+
+var globalStylesheet = new Map();
+
+exports['default'] = {
+  create: function create(styles) {
+    var stylesheet = arguments[1] === undefined ? globalStylesheet : arguments[1];
+
+    if (!stylesheet instanceof Map) throw new Error('' + stylesheet + ' should be a Map');
+
+    return Object.keys(styles).reduce(function (acc, key) {
+      var _seperateStyles = (0, _utils.seperateStyles)(styles[key]);
+
+      var style = _seperateStyles.style;
+      var pseudos = _seperateStyles.pseudos;
+      var mediaQueries = _seperateStyles.mediaQueries;
+
+      var className = (0, _utils.createClassName)((0, _utils.sortObject)(style));
+
+      if (className === undefined) {
+        acc[key] = '';
+        return acc;
+      }
+
+      if (!stylesheet.has(className)) stylesheet.set(className, style);
+
+      if (pseudos.length) {
+        pseudos.map(function (selector) {
+          delete style[selector];
+          var pseudoClassName = '' + className + '' + selector;
+
+          if (stylesheet.has(pseudoClassName)) return false;
+
+          stylesheet.set(pseudoClassName, styles[key][selector]);
+        });
+      }
+
+      if (mediaQueries.length) {
+        mediaQueries.map(function (selector) {
+          var mqSelector = selector;
+          var mqStyles = styles[key][selector];
+          var mqPseudos = [];
+          var mqStylesheet = undefined;
+
+          if (Array.isArray(selector)) {
+            var _selector = _toArray(selector);
+
+            var main = _selector[0];
+            var _styles = _selector[1];
+
+            var rest = _selector.slice(2);
+
+            mqSelector = main;
+            mqPseudos = rest;
+            mqStyles = _styles;
+          }
+
+          delete style[mqSelector];
+
+          if (stylesheet.has(mqSelector)) {
+            mqStylesheet = stylesheet.get(mqSelector);
+
+            if (mqStylesheet.has(className)) return false;
+          }
+
+          mqStylesheet = mqStylesheet || stylesheet.set(mqSelector, new Map()).get(mqSelector);
+
+          mqStylesheet.set(className, mqStyles);
+
+          if (mqPseudos.length) {
+            mqPseudos.map(function (pseudo) {
+              delete mqStyles[pseudo];
+              var pseudoClassName = '' + className + '' + pseudo;
+
+              if (mqStylesheet.has(pseudoClassName)) return false;
+              mqStylesheet.set(pseudoClassName, styles[key][mqSelector][pseudo]);
+            });
+          }
+        });
+      }
+
+      acc[key] = className;
+      return acc;
+    }, {});
+  },
+
+  render: function render() {
+    var options = arguments[0] === undefined ? { pretty: false } : arguments[0];
+    var stylesheet = arguments[1] === undefined ? globalStylesheet : arguments[1];
+
+    var stylesheetEntries = stylesheet.entries();
+    var css = '';
+    var mediaQueries = '';
+
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = stylesheetEntries[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var entry = _step.value;
+
+        var _entry = _slicedToArray(entry, 2);
+
+        var className = _entry[0];
+        var styles = _entry[1];
+
+        var isMap = styles instanceof Map;
+
+        if (!isMap && (0, _utils.isEmpty)(styles)) continue;
+
+        if (isMap) {
+          var mediaQueryCSS = this.render(options, stylesheet.get(className));
+          mediaQueries += options.pretty ? '' + className + ' {\n' + mediaQueryCSS + '}\n' : '' + className + '{' + mediaQueryCSS + '}';
+          continue;
+        }
+
+        var markup = (0, _utils.createMarkup)(styles);
+        css += options.pretty ? '.' + className + ' {\n' + markup.split(';').join(';\n') + '}\n' : '.' + className + '{' + markup + '}';
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator['return']) {
+          _iterator['return']();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
+
+    return css + mediaQueries;
+  },
+
+  clear: function clear() {
+    var stylesheet = arguments[0] === undefined ? globalStylesheet : arguments[0];
+
+    stylesheet.clear();
+    return !stylesheet.size;
+  },
+
+  __stylesheet: globalStylesheet
+};
+module.exports = exports['default'];
+
+},{"./utils":152}],152:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.sortObject = sortObject;
+exports.createHash = createHash;
+exports.stringifyObject = stringifyObject;
+exports.extendedToString = extendedToString;
+exports.createClassName = createClassName;
+exports.createMarkup = createMarkup;
+exports.isEmpty = isEmpty;
+exports.isPseudo = isPseudo;
+exports.isMediaQuery = isMediaQuery;
+exports.seperateStyles = seperateStyles;
+
+var _reactLibCSSPropertyOperations = require('react/lib/CSSPropertyOperations');
+
+function sortObject(obj) {
+  return Object.keys(obj).sort().reduce(function (acc, key) {
+    var val = obj[key];
+    if (val || val === 0) acc[key] = val;
+    return acc;
+  }, {});
+}
+
+function createHash(str) {
+  var i = str.length;
+  if (i === 0) return 0;
+
+  var hash = 5381;
+  while (i) hash = hash * 33 ^ str.charCodeAt(--i);
+
+  return hash >>> 0;
+}
+
+function stringifyObject(obj) {
+  var keys = Object.keys(obj);
+  var str = '';
+
+  for (var i = 0, len = keys.length; i < len; i++) {
+    str += keys[i] + obj[keys[i]];
+  }
+
+  return str;
+}
+
+var SYMBOL_SET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+function extendedToString(num, base) {
+  var conversion = '';
+
+  if (base > SYMBOL_SET.length || base <= 1 || !Number.isInteger(base)) throw new Error('' + base + ' should be an integer between 1 and ' + SYMBOL_SET.length);
+
+  while (num >= 1) {
+    conversion = SYMBOL_SET[num - base * Math.floor(num / base)] + conversion;
+    num = Math.floor(num / base);
+  }
+
+  return base < 11 ? parseInt(conversion) : conversion;
+}
+
+function createClassName(obj) {
+  var hash = extendedToString(createHash(stringifyObject(obj)), 62);
+  return hash ? '_' + hash : undefined;
+}
+
+function createMarkup(obj) {
+  return (0, _reactLibCSSPropertyOperations.createMarkupForStyles)(obj);
+}
+
+function isEmpty(obj) {
+  return !Object.keys(obj).length;
+}
+
+function isPseudo(_ref) {
+  var style = _ref.style;
+  var rule = _ref.rule;
+
+  return rule.charAt(0) === ':' && typeof style === 'object';
+}
+
+function isMediaQuery(_ref2) {
+  var style = _ref2.style;
+  var rule = _ref2.rule;
+
+  return rule.charAt(0) === '@' && typeof style === 'object';
+}
+
+function handle(type, acc, _ref3) {
+  var style = _ref3.style;
+  var rule = _ref3.rule;
+  var pseudos = arguments[3] === undefined ? [] : arguments[3];
+
+  var hash = createClassName(sortObject(style));
+  var rules = pseudos.length ? [[].concat(rule, style, pseudos)] : rule;
+
+  acc[type] = acc[type].concat(rules);
+  acc.style[rule] = hash;
+  return acc;
+}
+
+function seperateStyles(styles) {
+  return Object.keys(styles).reduce(function (acc, rule) {
+    var content = {
+      style: styles[rule],
+      rule: rule
+    };
+
+    if (isPseudo(content)) {
+      return handle('pseudos', acc, content);
+    }
+
+    if (isMediaQuery(content)) {
+      var _seperateStyles = seperateStyles(content.style);
+
+      var style = _seperateStyles.style;
+      var pseudos = _seperateStyles.pseudos;
+
+      return handle('mediaQueries', acc, { rule: rule, style: style }, pseudos);
+    }
+
+    acc.style[rule] = content.style;
+    return acc;
+  }, {
+    style: {},
+    pseudos: [],
+    mediaQueries: []
+  });
+}
+
+},{"react/lib/CSSPropertyOperations":8}],153:[function(require,module,exports){
 var React = require('react')
 
 var props = require('./props')
@@ -18380,7 +18672,7 @@ var element = component(props)
 
 React.render(element, document)
 
-},{"./props":153,"./views/index":154,"react":150}],152:[function(require,module,exports){
+},{"./props":155,"./views/index":156,"react":150}],154:[function(require,module,exports){
 var React = require('react')
 var r = require('r-dom')
 var Html = require('react-html')
@@ -18395,12 +18687,12 @@ module.exports = React.createClass({
       author: "Holodex",
       favicon: false,
       javascripts: ['js/index.js'],
-      stylesheets: ['css/index.css']
+      stylesheets: ['css/index.css', 'css/fonts.css']
     }, props.children)
   }
 })
 
-},{"r-dom":2,"react":150,"react-html":4}],153:[function(require,module,exports){
+},{"r-dom":2,"react":150,"react-html":4}],155:[function(require,module,exports){
 module.exports = {
   name: "Holodex",
   pitchPhrase: "People and Groups",
@@ -18413,10 +18705,11 @@ module.exports = {
   }
 }
 
-},{}],154:[function(require,module,exports){
+},{}],156:[function(require,module,exports){
 var React = require('react')
 var assign = require('object-assign')
 var r = require('r-dom')
+var Stylesheet = require('stilr')
 
 var Layout = require('../partials/layout')
 
@@ -18442,7 +18735,7 @@ var colors = {
   secondaryDark: ''
 }
 
-var style = {
+var style = Stylesheet.create({
   blocks: {
     width: '100%'
   },
@@ -18502,7 +18795,7 @@ var style = {
     fontWeight: 300
   },
   button: {
-    '-webkitAppearance': 'button',
+    'WebkitAppearance': 'button',
     cursor: 'pointer',
     alignItems: 'flex-start',
     textAlign: 'center',
@@ -18510,7 +18803,7 @@ var style = {
     backgroundColor: 'buttonface',
     textDecoration: 'none'
   }
-}
+})
 
 module.exports = React.createClass({
   render: function () {
@@ -18518,43 +18811,44 @@ module.exports = React.createClass({
 
     return r(Layout, props, [
       r.main({
-        style: style.blocks
+        className: style.blocks
       }, [
         r.header({
-          style: assign({}, style.block, style.introBlock)
+          className: style.block + ' ' + style.introBlock
         }, [
           r.h1({
-            style: style.introH1
+            className: style.introH1
           }, props.pitchPhrase),
           r.h2({
-            style: style.introH2
+            className: style.introH2
           }, props.pitchSentence),
           r.a({
+            className: style.actionButton,
             href: props.callToAction.url
           }, [
             r.button({
-              style: assign({}, style.button, style.actionButton),
+              className: style.button + ' ' + style.actionButton,
             }, props.callToAction.text)
           ])
         ]),
         r.section({
-          style: assign({}, style.block, style.aboutBlock)
+          className: style.block + ' ' + style.aboutBlock
         }, [
           r.h1({
-            style: style.aboutH1
+            className: style.aboutH1
           }, "What is " + props.name + "?"),
           r.p({
-            style: style.aboutP
+            className: style.aboutP
           }, props.description)
         ]),
         r.section({
-          style: assign({}, style.block, style.whoBlock)
+          className: style.block + ' ' + style.whoBlock
         }),
         r.section({
-          style: assign({}, style.block, style.actionBlock)
+          className: style.block + ' ' + style.actionBlock
         }, [
           r.p({
-            style: style.actionP
+            className: style.actionP
           }, props.callToAction.text)
         ])
       ])
@@ -18562,7 +18856,7 @@ module.exports = React.createClass({
   }
 })
 
-},{"../partials/layout":152,"object-assign":1,"r-dom":2,"react":150}]},{},[151])
+},{"../partials/layout":154,"object-assign":1,"r-dom":2,"react":150,"stilr":151}]},{},[153])
 
 
 //# sourceMappingURL=../maps/index.js.map
