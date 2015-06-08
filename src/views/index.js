@@ -84,7 +84,14 @@ var style = Stylesheet.create({
     borderRadius: 10,
     color: 'black',
     outline: 0,
-    fontWeight: 300
+    backgroundColor: 'transparent',
+    transition: 'background-color 0.4s ease-in-out, border-color 0.4s ease-in-out, color 0.4s ease-in-out',
+    fontWeight: 300,
+    ':hover': {
+      color: colors.secondary,
+      backgroundColor: 'white',
+      borderColor: colors.secondary
+    }
   },
   button: {
     'WebkitAppearance': 'button',
