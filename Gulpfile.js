@@ -40,8 +40,37 @@ gulp.task('watch-html', ['build-html'], function () {
 })
 
 //
+// css
+//
+// TODO make work for multiple views
+
+var Stylesheet = require('stilr')
+var autoprefixer = require('autoprefixer-core')
+var postcss = require('postcss')
+var mkdirp = require('mkdirp')
+
+function css (cb) {
+  require('./src/views/index')
+  var css = postcss(autoprefixer()).process(Stylesheet.render()).css
+  mkdirp('build/css', function (err) {
+    if (err) { return cb(err) }
+    fs.writeFile(__dirname + '/build/css/index.css', css, cb)
+  })
+}
+
+gulp.task('build-css', css)
+gulp.task('watch-css', ['build-css'], function () {
+  var watcher = gulp.watch('src/**/*.js', ['build-css'])
+  watcher.on('change', function (event) {
+    // invalidate require cache of file
+    delete require.cache[event.path]
+  })
+})
+
+//
 // js
 //
+// TODO make work for multiple views
 
 var browserify = require('browserify')
 var mold = require('mold-source-map')
@@ -148,6 +177,6 @@ function branch () {
 gulp.task('branch', ['build'], branch)
 
 // watch tasks
-gulp.task('watch', ['livereload', 'watch-html', 'watch-assets', 'watch-js'])
+gulp.task('watch', ['livereload', 'watch-html', 'watch-assets', 'watch-js', 'watch-css'])
 // build tasks
-gulp.task('build', ['build-html', 'build-assets', 'build-js'])
+gulp.task('build', ['build-html', 'build-assets', 'build-js', 'build-css'])
