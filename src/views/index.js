@@ -1,6 +1,7 @@
 var React = require('react')
 var assign = require('object-assign')
 var r = require('r-dom')
+var Stylesheet = require('stilr')
 
 var Layout = require('../partials/layout')
 
@@ -9,7 +10,7 @@ var vars = {
   gutterWidth: 60,
 }
 
-var style = {
+var style = Stylesheet.create({
   blocks: {
     width: '100%'
   },
@@ -19,7 +20,7 @@ var style = {
     padding: vars.gutterWidth
   },
   introBlock: {
-    backgroundImage: '-webkit-linear-gradient(top, #6f27ff, rgba(0,0,0,0));'
+    backgroundImage: 'linear-gradient(top, #6f27ff, rgba(0,0,0,0));'
   },
   introH1: {
     fontSize: vars.fontBase * 3,
@@ -48,10 +49,10 @@ var style = {
   },
   actionButton: {
     outline: 0,
-    '-webkitAppearance': 'button',
+    'WebkitAppearance': 'button',
     cursor: 'pointer'
   }
-}
+})
 
 module.exports = React.createClass({
   render: function () {
@@ -59,19 +60,19 @@ module.exports = React.createClass({
 
     return r(Layout, props, [
       r.main({
-        style: style.blocks
+        className: style.blocks
       }, [
         r.header({
-          style: assign(style.block, style.introBlock)
+          className: style.block + ' ' + style.introBlock
         }, [
           r.h1({
-            style: style.introH1
+            className: style.introH1
           }, props.pitchPhrase),
           r.h2({
-            style: style.introH2
+            className: style.introH2
           }, props.pitchSentence),
           r.a({
-            style: style.actionButton,
+            className: style.actionButton,
             href: props.callToAction.url
           }, props.callToAction.text)
         ]),
